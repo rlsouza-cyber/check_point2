@@ -30,14 +30,14 @@ resource "aws_instance" "provisioner_remote" {
     "Name" = "Remote-exec"
   }
   provisioner "file" {
-    source      = "/home/rodrigo/meuprimeirorepositorio/index.html"
+    source      = "/home/rodrigo/meuprimeirorepositorio/check_point2/index.html"
     destination = "/home/var/www/html/index.html"
     connection {
       type        = "ssh"
       user        = "ubuntu"
       private_key = "${file("~/.ssh/id_rsa")}"
-      host        = self.public
-    cidr_blocks = ["0.0.0.0/0"]
+      host        = self.public_ip
+    }
   }
 }
 resource "aws_security_group" "allow_http" {
