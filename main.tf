@@ -12,10 +12,10 @@ provider "aws" {
   region     = "us-east-1"
 }
 # SECURITY GROUP PARA INSTANCIA
-resource "aws_security_group" "nightly" {
-  name = "nightly"
-  description = "launch-wizard-1 created 2021-05-05T19:37:11.506-03:00"
-  vpc_id = "vpc-d68200ab"
+resource "aws_security_group" "Work_VPC" {
+  name = "Work_VPC"
+  description = "Permite ssh"
+  vpc_id = "vpc-0b67c125b8e926673"
 # A regra a seguir libera saída para qualquer destino em qualquer protocolo
   egress {
     from_port = 0
@@ -32,12 +32,11 @@ resource "aws_security_group" "nightly" {
 }
 # provisioner
 resource "aws_instance" "checkpoint2" {
-    ami = "ami-042e8287309f5df03"
+    ami = "ami-0d5eff06f840b45e9"
     instance_type = "t2.micro"
-    subnet_id = "subnet-14c4b935"
+    subnet_id = "subnet-0bf7eeb4e35c4959d"
     key_name = "nightly"
-    
-    provisioner "remote-exec" {
+        provisioner "remote-exec" {
         inline = [ 
             "sudo apt-get update",
             "sudo apt-get -y install nginx",
@@ -55,12 +54,12 @@ resource "aws_instance" "checkpoint2" {
       
     }
    provisioner "file" {
-   source      = "/home/rodrigo/meuprimeirorepositorio/check_point/main.tf"
+   source      = "/home/rodrigo/meuprimeirorepositorio/check_point2/index.html"
    destination = "/tmp/index.html"
    connection {
             type = "ssh"
             user = "ubuntu"
-            private_key = file("~/.ssh/id_rsa")
+            private_key = file("~/.ssh/id_rsa")                                                                                                                                                                                                                                                                                                                                                                                                                                                     
             host = self.public_ip
     }
     }  
