@@ -1,58 +1,78 @@
+# DEFINIÇÃO DO PROVIDER
 terraform {
   required_providers {
-    aws = {}
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
   }
 }
-# Nesse bloco, estamos definindo o provider. O provider é um plugin que nos abilita interagir com sistemas remotos. Os providers podem ser encontrados aqui: https://registry.terraform.io/browse/providers
+# DEFINIÇÃO DA REGIÃO 
 provider "aws" {
-  region = "us-east-1"
+  region     = "us-east-1"
 }
-resource "aws_instance" "provisioner_remote" {
-  ami           = "ami-0a313d6098716f372"
-  instance_type = "t2.micro"
-  security_groups = [ 
-    aws_security_group.allow_http.name
-    ]
-  provisioner "remote-exec" {
-    inline = [
-      "sudo yum install httpd -y",
-      "sudo systemctl enable httpd.service",
-      "sudo systemctl start httpd.service"
-    ]
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("~/.ssh/id_rsa")
-      host        = self.public_ip
-    }
-  }  
-  tags = {
-    "Name" = "Remote-exec"
-  }
-  provisioner "file" {
-    source      = "/home/rodrigo/meuprimeirorepositorio/check_point2/index.html"
-    destination = "/home/var/www/html/index.html"
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = "${file("~/.ssh/id_rsa")}"
-      host        = self.public_ip
-    }
-  }
-}
-resource "aws_security_group" "allow_http" {
-  name        = "allow_http"
-  description = "Allow http inbound"
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+# SECURITY GROUP PARA INSTANCIA
+resource "aws_security_group" "nightly" {
+  name = "nightly"
+  description = "launch-wizard-1 created 2021-05-05T19:37:11.506-03:00"
+  vpc_id = "vpc-d68200ab"
+# A regra a seguir libera saída para qualquer destino em qualquer protocolo
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+    ingress {
+      from_port       = "0"
+      to_port         = "0"
+      protocol        = "-1"
+      cidr_blocks = [ "0.0.0.0/0" ]
+  }
+}
+# provisioner
+resource "aws_instance" "checkpoint2" {
+    ami = "ami-042e8287309f5df03"
+    instance_type = "t2.micro"
+    subnet_id = "subnet-14c4b935"
+    key_name = "nightly"
+    
+    provisioner "remote-exec" {
+        inline = [ 
+            "sudo apt-get update",
+            "sudo apt-get -y install nginx",
+            "sudo systemctl start nginx"
+        ]
+    #provisioner "file" {aws_security_group"}
+    #   source = "index.html"
+    #   destination = "/tmp/index.html"
+        connection {
+            type = "ssh"
+            user = "ubuntu"
+            private_key = file("~/.ssh/id_rsa")
+            host = self.public_ip
+        }
+      
+    }
+   provisioner "file" {
+   source      = "/home/rodrigo/meuprimeirorepositorio/check_point/main.tf"
+   destination = "/tmp/index.html"
+   connection {
+            type = "ssh"
+            user = "ubuntu"
+            private_key = file("~/.ssh/id_rsa")
+            host = self.public_ip
+    }
+    }  
+    provisioner "remote-exec" {
+        inline = [ 
+            "sudo mv /tmp/index.html /var/www/html/index.nginx-debian.html"
+        ]
+    connection {
+            type = "ssh"
+            user = "ubuntu"
+            private_key = file("~/.ssh/id_rsa")
+            host = self.public_ip
+  }
+}
 }
