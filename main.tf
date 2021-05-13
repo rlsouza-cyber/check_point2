@@ -12,8 +12,8 @@ provider "aws" {
   region     = "us-east-1"
 }
 # SECURITY GROUP PARA INSTANCIA
-resource "aws_security_group" "Work_VPC" {
-  name = "Work_VPC"
+resource "aws_security_group" "work_vpc" {
+  name = "work_vpc"
   description = "Permite ssh"
   vpc_id = "vpc-0b67c125b8e926673"
 # A regra a seguir libera saída para qualquer destino em qualquer protocolo
