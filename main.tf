@@ -12,10 +12,10 @@ provider "aws" {
   region     = "us-east-1"
 }
 # SECURITY GROUP PARA INSTANCIA
-resource "aws_security_group" "work_vpc" {
-  name = "work_vpc"
-  description = "Permite ssh"
-  vpc_id = "vpc-0b67c125b8e926673"
+resource "aws_security_group" "checklist" {
+  name = "checklist"
+  description = "checklist"
+  vpc_id = "vpc-06b0c9ffc24850008"
 # A regra a seguir libera saída para qualquer destino em qualquer protocolo
   egress {
     from_port = 0
@@ -34,10 +34,10 @@ resource "aws_security_group" "work_vpc" {
 resource "aws_instance" "checkpoint2" {
     ami = "ami-0d5eff06f840b45e9"
     instance_type = "t2.micro"
-    subnet_id = "subnet-0bf7eeb4e35c4959d"
+    subnet_id = "subnet-0741afa6b18bff170"
     key_name = "nightly"   
  provisioner "file" {
-   source      = "/home/rodrigo/meuprimeirorepositorio/check_point2/index.html"
+   source      = "/home/rodrigo/meuprimeirorepositorio/check_point/index.html"
    destination = "/tmp/index.html"
    connection {
             type = "ssh"
@@ -62,3 +62,5 @@ resource "aws_instance" "checkpoint2" {
   }
 }
 }
+
+
